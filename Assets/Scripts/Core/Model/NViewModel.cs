@@ -2,13 +2,10 @@
 using UnityEngine;
 using System.Collections;
 
-public abstract class NViewModel
+public abstract class NViewModel : NBindable
 {
-    public event Action ValueChanged;
-
-    public virtual void OnValueChanged()
+    protected virtual void OnValueChange()
     {
-        var handler = ValueChanged;
-        if (handler != null) handler();
+        base.OnValueChange();
     }
 }

@@ -63,7 +63,7 @@ public abstract class NViewController<TView> : MonoBehaviour
 
     public virtual void Close()
     {
-        model.ValueChanged -= OnViewModelChanged;
+        model.OnValueChangeHandle -= OnViewModelChanged;
         var type = typeof(TView);
         manager.Close(type);
         OnClose();
@@ -72,7 +72,7 @@ public abstract class NViewController<TView> : MonoBehaviour
     public virtual void BindModel(NViewModel viewModel)
     {
         model = viewModel;
-        model.ValueChanged += OnViewModelChanged;
+        model.OnValueChangeHandle += OnViewModelChanged;
     }
 
     private void OnViewModelChanged()

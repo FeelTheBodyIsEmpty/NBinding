@@ -3,5 +3,5 @@ using System.Collections;
 
 public class MessageInfo : NViewModel
 {
-    public string Text;
+    public NString Text = new NString("");
 }
