@@ -15,14 +15,18 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public abstract class NViewController : MonoBehaviour
+public abstract class NViewController<TView> : MonoBehaviour
 {
     public NViewModel model { get; private set; }
-    public NViewManager manager;
+    public NViewManager manager = NViewManager.Create();
+    private Dictionary<string, NViewModel> models;
+    private Dictionary<UILabel, string> elLabels;
+
     private void Awake()
     {
-        manager = NViewManager.Create();
+        OnInit();
     }
 
     // Use this for initialization
@@ -44,30 +48,41 @@ public abstract class NViewController : MonoBehaviour
 
     public virtual void Open()
     {
-        manager.Open(this.GetType());
+        var type = typeof(TView);
+        manager.Open(type);
+        models = NViewModelBinder.GetAllModels(this, type);
+        elLabels = NViewModelBinder.FindElBindingLabels(this);
+        // AutoBind
+        foreach (KeyValuePair<string, NViewModel> pair in models)
+        {
+            BindModel(pair.Value);
+        }
+        RefreshBandingUI();
         OnOpen();
     }
 
     public virtual void Close()
     {
-        model.OnValueChanged += OnViewModelValueChanged;
-        manager.Close(this.GetType());
+        model.ValueChanged -= OnViewModelChanged;
+        var type = typeof(TView);
+        manager.Close(type);
         OnClose();
     }
 
     public virtual void BindModel(NViewModel viewModel)
     {
         model = viewModel;
-        viewModel.OnValueChanged += OnViewModelValueChanged;
+        model.ValueChanged += OnViewModelChanged;
     }
 
-    private void OnViewModelValueChanged()
+    private void OnViewModelChanged()
     {
-        this.RefreshUI();
+        this.RefreshBandingUI();
     }
 
-    private void RefreshUI()
+    public void RefreshBandingUI()
     {
         // TODO 这里根据绑定的UI进行遍历更新
+        NViewModelBinder.UpdateByEl(this, elLabels, models);
     }
 }
