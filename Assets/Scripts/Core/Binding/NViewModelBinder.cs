@@ -21,6 +21,14 @@ public static class NViewModelBinder
                 models.Add(fieldInfo.Name, fieldInfo.GetValue(controller) as NViewModel);
             }
         }
+        var propertys = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        foreach (PropertyInfo propertyInfo in propertys)
+        {
+            if (propertyInfo.PropertyType.IsSubclassOf(typeof(NViewModel)))
+            {
+                models.Add(propertyInfo.Name, propertyInfo.GetValue(controller, null) as NViewModel);
+            }
+        }
         return models;
     }
 
@@ -81,19 +89,29 @@ public static class NViewModelBinder
         var type = objType;
         foreach (var nodeName in nodes)
         {
-            var fieldInfo = GetFieldByName(type, nodeName.Trim());
-            if (fieldInfo == null)
+            var memberInfo = GetMemberInfoByName(type, nodeName.Trim());
+            if (memberInfo == null)
             {
                 Debug.LogError(string.Format("El表达式'{0}'找不到对应路径 {1}", elPath, nodeName));
                 return null;
             }
-            value = fieldInfo.GetValue(value);
-            type = fieldInfo.FieldType;
+            var fieldInfo = memberInfo as FieldInfo;
+            var propertyInfo = memberInfo as PropertyInfo;
+            if (fieldInfo != null)
+            {
+                value = fieldInfo.GetValue(value);
+                type = fieldInfo.FieldType;
+            }
+            if (propertyInfo != null)
+            {
+                value = propertyInfo.GetValue(value, null);
+                type = propertyInfo.PropertyType;
+            }
         }
         return value;
     }
 
-    private static FieldInfo GetFieldByName(Type type, string fieldName)
+    private static MemberInfo GetMemberInfoByName(Type type, string fieldName)
     {
         var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (FieldInfo fieldInfo in fields)
@@ -101,6 +119,14 @@ public static class NViewModelBinder
             if (fieldInfo.Name.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
             {
                 return fieldInfo;
+            }
+        }
+        var propertys = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        foreach (PropertyInfo propertyInfo in propertys)
+        {
+            if (propertyInfo.Name.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
+            {
+                return propertyInfo;
             }
         }
         return null;

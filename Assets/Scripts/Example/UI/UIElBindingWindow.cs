@@ -24,13 +24,14 @@ public class UIElBindingWindow : NViewController<UIElBindingWindow>
     }
     public override void OnInit()
     {
-        message = NViewModelFactory<MessageInfo>.Create();// new MessageInfo { Text = new NBaseModel<string>("This the Binding Label") };
-        message.Text.Value = "This the Binding Label";
+        message = new MessageInfo();// new MessageInfo { Text = new NBaseModel<string>("This the Binding Label") };
+        message.Text = "This the Binding Label";
         var button = this.transform.FindChild("Button");
         // 点击模拟数据修改操作
         UIEventListener.Get(button.gameObject).onClick = go =>
         {
-            message.Text.Value += ".Append";
+            message.Text += ".Append";
+            message.RaiseValueChangeEvent();
         };
         // 由于是Demo, 所以自己把自己打开
         this.Open();

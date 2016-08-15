@@ -6,6 +6,6 @@ public abstract class NViewModel : NBindable
 {
     protected virtual void OnValueChange()
     {
-        base.OnValueChange();
+        base.RaiseValueChangeEvent();
     }
 }
