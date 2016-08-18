@@ -31,7 +31,7 @@ public class UIElBindingWindow : NViewController<UIElBindingWindow>
         UIEventListener.Get(button.gameObject).onClick = go =>
         {
             message.Text += ".Append";
-            message.RaiseValueChangeEvent();
+            //message.RaiseValueChangeEvent();
         };
         // 由于是Demo, 所以自己把自己打开
         this.Open();

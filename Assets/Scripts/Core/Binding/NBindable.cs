@@ -31,11 +31,11 @@ public abstract class NBindable
         var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (FieldInfo field in fields)
         {
-            if (field.GetType().IsSubclassOf(typeof (NBindable)))
+            if (field.FieldType.IsSubclassOf(typeof (NBindable)))
             {
                 var child = field.GetValue(this) as NBindable;
                 if (child == null) continue;
-                child.onValueChange += changeHandle;
+                //child.onValueChange += changeHandle;
                 child.InitChangeEvent(field.FieldType, changeHandle);
             }
         }
